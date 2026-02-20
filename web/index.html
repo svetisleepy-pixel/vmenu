@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ESX Admin Panel</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app" class="hidden">
+    <aside class="sidebar">
+      <h1>Admin Panel</h1>
+      <button data-tab="dashboard" class="tab active">Dashboard</button>
+      <button data-tab="players" class="tab">Players</button>
+      <button data-tab="reports" class="tab">Reports</button>
+      <button data-tab="services" class="tab">Community Service</button>
+      <button data-tab="logs" class="tab">Logs</button>
+      <button id="closeBtn" class="danger">Close</button>
+    </aside>
+
+    <main class="content">
+      <section id="dashboard" class="panel active"></section>
+      <section id="players" class="panel"></section>
+      <section id="reports" class="panel"></section>
+      <section id="services" class="panel"></section>
+      <section id="logs" class="panel"></section>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
