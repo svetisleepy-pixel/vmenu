@@ -1,0 +1,51 @@
+* { box-sizing: border-box; font-family: Inter, Arial, sans-serif; }
+body { margin: 0; color: #f2f3f7; }
+.hidden { display: none !important; }
+#app {
+  position: fixed;
+  inset: 5vh 5vw;
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  background: rgba(12, 14, 19, 0.96);
+  border: 1px solid #2f3442;
+  border-radius: 12px;
+  overflow: hidden;
+}
+.sidebar { background: #171a22; padding: 18px; display: flex; flex-direction: column; gap: 8px; }
+.sidebar h1 { margin: 0 0 10px; font-size: 24px; }
+button {
+  border: 1px solid #343d4d;
+  background: #202736;
+  color: #fff;
+  border-radius: 8px;
+  padding: 9px 11px;
+  cursor: pointer;
+}
+button:hover { filter: brightness(1.08); }
+.tab.active { background: #2d466a; border-color: #4a84cb; }
+button.danger { margin-top: auto; background: #5d1f28; border-color: #8b2d3b; }
+.content { padding: 20px; overflow-y: auto; }
+.panel { display: none; }
+.panel.active { display: block; }
+.grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-bottom: 20px; }
+.card { background: #1a2231; border: 1px solid #32435d; border-radius: 10px; padding: 12px; }
+.card h3 { margin: 0 0 8px; font-size: 14px; color: #9ebde6; }
+.card p { margin: 0; font-size: 24px; font-weight: 700; }
+
+.table { width: 100%; border-collapse: collapse; }
+.table th, .table td { border-bottom: 1px solid #2d3445; padding: 8px; text-align: left; font-size: 13px; }
+.table th { color: #95a8c7; font-weight: 600; }
+.row-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+.row-actions button { padding: 6px 8px; font-size: 12px; }
+input, textarea, select {
+  width: 100%;
+  background: #0d121d;
+  color: #fff;
+  border: 1px solid #30425f;
+  border-radius: 8px;
+  padding: 8px;
+}
+.form { display: grid; gap: 8px; margin-bottom: 12px; max-width: 550px; }
+.log-item { border-bottom: 1px solid #2b3240; padding: 8px 0; }
+.log-item small { color: #8ea2c3; }
+.service-banner { position: fixed; right: 14px; bottom: 14px; background: #422f14; border: 1px solid #aa7d21; padding: 8px 12px; border-radius: 8px; }
