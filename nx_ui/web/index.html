@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>NX UI</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+</head>
+<body>
+    <div id="hud" class="panel glass">
+        <div class="ring" data-key="health"><i class="fa-solid fa-heart"></i><span>100</span></div>
+        <div class="ring" data-key="armor"><i class="fa-solid fa-shield-halved"></i><span>0</span></div>
+        <div class="ring" data-key="stamina"><i class="fa-solid fa-bolt"></i><span>0</span></div>
+        <div class="stat"><i class="fa-solid fa-wallet"></i><span id="money">$0</span></div>
+        <div class="stat"><i class="fa-solid fa-briefcase"></i><span id="job">Unemployed</span></div>
+    </div>
+
+    <div id="target" class="glass hidden">
+        <i id="targetIcon" class="fa-solid fa-hand"></i>
+        <span id="targetLabel">Interact</span>
+    </div>
+
+    <div id="notifications"></div>
+
+    <div id="progress" class="glass hidden">
+        <div class="label" id="progressLabel">Processing</div>
+        <div class="bar"><div id="progressFill"></div></div>
+    </div>
+
+    <div id="inventory" class="glass hidden">
+        <div class="head">Inventory</div>
+        <div id="inventoryItems" class="grid"></div>
+        <button id="closeInventory">Close</button>
+    </div>
+
+    <div id="dispatch" class="glass">
+        <div class="head">Dispatch Feed</div>
+        <div id="dispatchList"></div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
