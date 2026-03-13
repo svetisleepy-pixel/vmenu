@@ -5,6 +5,7 @@ local currentAction = false
 local promptVisible = false
 local currentPromptText = nil
 local plantModelLoaded = false
+local processInputLocked = false
 
 local function debugPrint(...)
     if Config.Debug then
@@ -67,6 +68,26 @@ end
 
 local function playScenario(scenario)
     TaskStartScenarioInPlace(PlayerPedId(), scenario, 0, true)
+end
+
+local function playAnimation(dict, name, duration)
+    if not dict or not name then
+        return false
+    end
+
+    RequestAnimDict(dict)
+    local timeout = GetGameTimer() + 5000
+
+    while not HasAnimDictLoaded(dict) and GetGameTimer() < timeout do
+        Wait(0)
+    end
+
+    if not HasAnimDictLoaded(dict) then
+        return false
+    end
+
+    TaskPlayAnim(PlayerPedId(), dict, name, 8.0, -8.0, duration, 1, 0.0, false, false, false)
+    return true
 end
 
 local function clearActionState()
@@ -275,20 +296,40 @@ CreateThread(function()
                 waitTime = 0
                 showInteractionPrompt('[E] Process 1 cocaine leaf')
 
-                if IsControlJustReleased(0, 38) then
+                if IsControlJustReleased(0, 38) and not processInputLocked then
+                    processInputLocked = true
+                    currentAction = true
+
+                    SetTimeout(5000, function()
+                        if currentAction and processInputLocked then
+                            currentAction = false
+                            processInputLocked = false
+                            hideInteractionPrompt()
+                        end
+                    end)
+
                     ESX.TriggerServerCallback('vmenu_cocaine:server:canProcess', function(canProcess)
                         if not canProcess then
                             ESX.ShowNotification('You have no cocaine leaves to process.')
+                            currentAction = false
                             hideInteractionPrompt()
+
+                            SetTimeout(Config.ProcessInputCooldown, function()
+                                processInputLocked = false
+                            end)
                             return
                         end
 
-                        currentAction = true
                         FreezeEntityPosition(ped, true)
-                        playScenario(Config.ProcessScenario)
+
+                        local animPlayed = playAnimation(Config.ProcessAnimDict, Config.ProcessAnimName, Config.ProcessDuration)
+                        if not animPlayed then
+                            playScenario('WORLD_HUMAN_STAND_IMPATIENT')
+                        end
 
                         local finished = runProgressBar('Processing cocaine leaves...', Config.ProcessDuration)
                         clearActionState()
+                        processInputLocked = false
 
                         if finished then
                             TriggerServerEvent('vmenu_cocaine:server:processLeaves')

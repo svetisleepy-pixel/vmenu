@@ -24,7 +24,8 @@ ESX-compatible cocaine gameplay loop for FiveM:
 - You can switch to GTA default help UI with `Config.InteractionUI = 'gta_help'`.
 - Progress uses `exports['esx_progressbar']:Progressbar(...)` when available.
 - If `esx_progressbar` is not installed or fails, it falls back to a simple `Wait()`-based timer.
-- Processing uses existing GTA scenario `WORLD_HUMAN_HAMMERING`.
+- Processing uses animation `anim@heists@ornate_bank@grab_cash` / `grab` (in-place), with safe scenario fallback.
 - Sniffing uses existing GTA scenario `WORLD_HUMAN_SMOKING_POT`.
 - Plant entities are now forced to ground placement with collision loading and per-plant ground-Z snapping on uneven terrain.
+- Processing has anti-spam input lock to prevent E-key spam/multi-trigger.
 - Plant rewards and processing output are fully server-side randomized.

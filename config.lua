@@ -27,7 +27,8 @@ Config.CokeEffectDuration = 30000 -- ms
 Config.CokeScreenEffect = 'DrugsTrevorClownsFight'
 
 Config.PickScenario = 'world_human_gardener_plant'
-Config.ProcessScenario = 'WORLD_HUMAN_HAMMERING'
+Config.ProcessAnimDict = 'anim@heists@ornate_bank@grab_cash'
+Config.ProcessAnimName = 'grab'
 
 Config.UseProgressFallback = true
 
@@ -35,3 +36,5 @@ Config.InteractionUI = 'esx_textui' -- 'esx_textui' or 'gta_help'
 
 Config.SniffDuration = 4000 -- ms
 Config.SniffScenario = 'WORLD_HUMAN_SMOKING_POT'
+
+Config.ProcessInputCooldown = 1000 -- ms anti-spam lock while checking inventory
