@@ -31,7 +31,7 @@ Config.ProcessScenario = 'WORLD_HUMAN_HAMMERING'
 
 Config.UseProgressFallback = true
 
-Config.InteractionUI = 'textui' -- 'textui' or 'gta_help'
+Config.InteractionUI = 'esx_textui' -- 'esx_textui' or 'gta_help'
 
 Config.SniffDuration = 4000 -- ms
 Config.SniffScenario = 'WORLD_HUMAN_SMOKING_POT'

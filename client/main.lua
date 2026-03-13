@@ -2,6 +2,9 @@ local ESX = exports['es_extended']:getSharedObject()
 
 local spawnedPlants = {}
 local currentAction = false
+local promptVisible = false
+local currentPromptText = nil
+local plantModelLoaded = false
 
 local function debugPrint(...)
     if Config.Debug then
@@ -15,39 +18,63 @@ local function showGtaHelp(text)
     EndTextCommandDisplayHelp(0, false, true, -1)
 end
 
-local function drawTextUi(text)
-    DrawRect(0.5, 0.92, 0.36, 0.04, 0, 0, 0, 120)
-    SetTextFont(4)
-    SetTextScale(0.34, 0.34)
-    SetTextColour(255, 255, 255, 220)
-    SetTextCentre(true)
-    SetTextOutline()
-    BeginTextCommandDisplayText('STRING')
-    AddTextComponentSubstringPlayerName(text)
-    EndTextCommandDisplayText(0.5, 0.907)
+local function showEsxTextUi(text)
+    local ok = pcall(function()
+        exports['esx_textui']:TextUI(text)
+    end)
+
+    if ok then
+        promptVisible = true
+        currentPromptText = text
+        return true
+    end
+
+    return false
 end
 
-local function showInteractionPrompt(text)
-    if Config.InteractionUI == 'gta_help' then
-        showGtaHelp(text)
+local function hideEsxTextUi()
+    if not promptVisible then
         return
     end
 
-    drawTextUi(text)
+    pcall(function()
+        exports['esx_textui']:HideUI()
+    end)
+
+    promptVisible = false
+    currentPromptText = nil
+end
+
+local function showInteractionPrompt(text)
+    if Config.InteractionUI == 'esx_textui' then
+        if (not promptVisible) or currentPromptText ~= text then
+            hideEsxTextUi()
+            if not showEsxTextUi(text) then
+                showGtaHelp(text)
+            end
+        end
+        return
+    end
+
+    showGtaHelp(text)
+end
+
+local function hideInteractionPrompt()
+    if Config.InteractionUI == 'esx_textui' then
+        hideEsxTextUi()
+    end
 end
 
 local function playScenario(scenario)
-    local ped = PlayerPedId()
-    TaskStartScenarioInPlace(ped, scenario, 0, true)
+    TaskStartScenarioInPlace(PlayerPedId(), scenario, 0, true)
 end
-
-
 
 local function clearActionState()
     local ped = PlayerPedId()
     FreezeEntityPosition(ped, false)
     ClearPedTasks(ped)
     currentAction = false
+    hideInteractionPrompt()
 end
 
 local function runProgressBar(label, duration)
@@ -67,11 +94,39 @@ local function runProgressBar(label, duration)
     return completed
 end
 
+local function ensurePlantModelLoaded()
+    if plantModelLoaded then
+        return true
+    end
+
+    RequestModel(Config.PlantModel)
+    local timeout = GetGameTimer() + 5000
+
+    while not HasModelLoaded(Config.PlantModel) and GetGameTimer() < timeout do
+        Wait(0)
+    end
+
+    plantModelLoaded = HasModelLoaded(Config.PlantModel)
+    return plantModelLoaded
+end
 
 local function resolvePlantGroundZ(coords)
-    local ok, groundZ = GetGroundZFor_3dCoord(coords.x, coords.y, coords.z + 200.0, false)
-    if ok then
-        return groundZ
+    local testHeights = { 1000.0, 500.0, 250.0, 120.0, 60.0 }
+
+    for i = 1, #testHeights do
+        local sampleZ = coords.z + testHeights[i]
+
+        RequestCollisionAtCoord(coords.x, coords.y, sampleZ)
+        local tries = 0
+        while not HasCollisionLoadedAroundEntity(PlayerPedId()) and tries < 20 do
+            Wait(0)
+            tries = tries + 1
+        end
+
+        local found, groundZ = GetGroundZFor_3dCoord(coords.x, coords.y, sampleZ, false)
+        if found then
+            return groundZ
+        end
     end
 
     return coords.z
@@ -84,23 +139,30 @@ local function syncPlantEntities(plantData)
         active[plant.id] = true
 
         if not spawnedPlants[plant.id] then
-            RequestModel(Config.PlantModel)
-            while not HasModelLoaded(Config.PlantModel) do
-                Wait(0)
+            if not ensurePlantModelLoaded() then
+                debugPrint('Failed to load plant model:', Config.PlantModel)
+                break
             end
 
             local spawnZ = resolvePlantGroundZ(plant.coords)
-            local obj = CreateObject(Config.PlantModel, plant.coords.x, plant.coords.y, spawnZ, false, false, false)
+            local obj = CreateObjectNoOffset(Config.PlantModel, plant.coords.x, plant.coords.y, spawnZ, false, false, false)
+
             SetEntityAsMissionEntity(obj, true, true)
+            SetEntityCollision(obj, true, true)
             PlaceObjectOnGroundProperly(obj)
             FreezeEntityPosition(obj, true)
 
+            local objCoords = GetEntityCoords(obj)
             spawnedPlants[plant.id] = {
                 entity = obj,
-                coords = vector3(plant.coords.x, plant.coords.y, plant.coords.z)
+                coords = vector3(objCoords.x, objCoords.y, objCoords.z)
             }
         else
-            spawnedPlants[plant.id].coords = vector3(plant.coords.x, plant.coords.y, plant.coords.z)
+            local ent = spawnedPlants[plant.id].entity
+            if DoesEntityExist(ent) then
+                local objCoords = GetEntityCoords(ent)
+                spawnedPlants[plant.id].coords = vector3(objCoords.x, objCoords.y, objCoords.z)
+            end
         end
     end
 
@@ -123,7 +185,6 @@ RegisterNetEvent('vmenu_cocaine:client:useCoke', function()
     local ped = PlayerPedId()
 
     FreezeEntityPosition(ped, true)
-
     playScenario(Config.SniffScenario)
 
     local finished = runProgressBar('Sniffing cocaine...', Config.SniffDuration)
@@ -136,7 +197,6 @@ RegisterNetEvent('vmenu_cocaine:client:useCoke', function()
 
     SetPedArmour(ped, Config.CokeArmor)
     SetRunSprintMultiplierForPlayer(PlayerId(), Config.CokeSpeedMultiplier)
-
     StartScreenEffect(Config.CokeScreenEffect, 0, true)
 
     CreateThread(function()
@@ -162,6 +222,9 @@ CreateThread(function()
 
             for id, plant in pairs(spawnedPlants) do
                 if DoesEntityExist(plant.entity) then
+                    local objCoords = GetEntityCoords(plant.entity)
+                    plant.coords = vector3(objCoords.x, objCoords.y, objCoords.z)
+
                     local distance = #(playerCoords - plant.coords)
                     if distance < closestPlantDistance then
                         closestPlantDistance = distance
@@ -170,7 +233,10 @@ CreateThread(function()
                 end
             end
 
-            if closestPlantId and closestPlantDistance <= Config.HarvestInteractDistance then
+            local nearPlant = closestPlantId and closestPlantDistance <= Config.HarvestInteractDistance
+            local nearProcess = #(playerCoords - Config.ProcessLocation) <= Config.ProcessInteractDistance
+
+            if nearPlant then
                 waitTime = 0
                 showInteractionPrompt('[E] Pick cocaine plant')
 
@@ -186,10 +252,7 @@ CreateThread(function()
                         TriggerServerEvent('vmenu_cocaine:server:harvestPlant', closestPlantId)
                     end
                 end
-            end
-
-            local processDistance = #(playerCoords - Config.ProcessLocation)
-            if processDistance <= Config.ProcessInteractDistance then
+            elseif nearProcess then
                 waitTime = 0
                 showInteractionPrompt('[E] Process 1 cocaine leaf')
 
@@ -197,12 +260,12 @@ CreateThread(function()
                     ESX.TriggerServerCallback('vmenu_cocaine:server:canProcess', function(canProcess)
                         if not canProcess then
                             ESX.ShowNotification('You have no cocaine leaves to process.')
+                            hideInteractionPrompt()
                             return
                         end
 
                         currentAction = true
                         FreezeEntityPosition(ped, true)
-
                         playScenario(Config.ProcessScenario)
 
                         local finished = runProgressBar('Processing cocaine leaves...', Config.ProcessDuration)
@@ -213,13 +276,16 @@ CreateThread(function()
                         end
                     end)
                 end
+            else
+                hideInteractionPrompt()
             end
+        else
+            hideInteractionPrompt()
         end
 
         Wait(waitTime)
     end
 end)
-
 
 CreateThread(function()
     while true do
@@ -232,6 +298,8 @@ AddEventHandler('onResourceStop', function(resourceName)
     if resourceName ~= GetCurrentResourceName() then
         return
     end
+
+    hideInteractionPrompt()
 
     for _, plant in pairs(spawnedPlants) do
         if DoesEntityExist(plant.entity) then
