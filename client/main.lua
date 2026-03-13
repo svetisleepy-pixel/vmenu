@@ -9,10 +9,31 @@ local function debugPrint(...)
     end
 end
 
-local function showHelpNotification(text)
+local function showGtaHelp(text)
     BeginTextCommandDisplayHelp('STRING')
     AddTextComponentSubstringPlayerName(text)
     EndTextCommandDisplayHelp(0, false, true, -1)
+end
+
+local function drawTextUi(text)
+    DrawRect(0.5, 0.92, 0.36, 0.04, 0, 0, 0, 120)
+    SetTextFont(4)
+    SetTextScale(0.34, 0.34)
+    SetTextColour(255, 255, 255, 220)
+    SetTextCentre(true)
+    SetTextOutline()
+    BeginTextCommandDisplayText('STRING')
+    AddTextComponentSubstringPlayerName(text)
+    EndTextCommandDisplayText(0.5, 0.907)
+end
+
+local function showInteractionPrompt(text)
+    if Config.InteractionUI == 'gta_help' then
+        showGtaHelp(text)
+        return
+    end
+
+    drawTextUi(text)
 end
 
 local function playScenario(scenario)
@@ -109,9 +130,9 @@ RegisterNetEvent('vmenu_cocaine:client:useCoke', function()
     local ped = PlayerPedId()
 
     FreezeEntityPosition(ped, true)
-    playAnimation('mp_suicide', 'pill', 3000)
+    playAnimation(Config.SniffAnimDict, Config.SniffAnimName, Config.SniffDuration)
 
-    local finished = runProgressBar('Sniffing cocaine...', 3000)
+    local finished = runProgressBar('Sniffing cocaine...', Config.SniffDuration)
     FreezeEntityPosition(ped, false)
     ClearPedTasks(ped)
 
@@ -157,7 +178,7 @@ CreateThread(function()
 
             if closestPlantId and closestPlantDistance <= Config.HarvestInteractDistance then
                 waitTime = 0
-                showHelpNotification('Press ~INPUT_CONTEXT~ to pick cocaine plant')
+                showInteractionPrompt('[E] Pick cocaine plant')
 
                 if IsControlJustReleased(0, 38) then
                     currentAction = true
@@ -176,7 +197,7 @@ CreateThread(function()
             local processDistance = #(playerCoords - Config.ProcessLocation)
             if processDistance <= Config.ProcessInteractDistance then
                 waitTime = 0
-                showHelpNotification('Press ~INPUT_CONTEXT~ to process cocaine leaves')
+                showInteractionPrompt('[E] Process 1 cocaine leaf')
 
                 if IsControlJustReleased(0, 38) then
                     ESX.TriggerServerCallback('vmenu_cocaine:server:canProcess', function(canProcess)

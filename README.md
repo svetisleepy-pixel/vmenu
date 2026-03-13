@@ -20,7 +20,9 @@ ESX-compatible cocaine gameplay loop for FiveM:
 
 ## Notes
 
-- Interaction prompt uses native GTA help UI (top-left `Press E`).
+- Interaction prompt defaults to a built-in TextUI (`Config.InteractionUI = 'textui'`).
+- You can switch to GTA default help UI with `Config.InteractionUI = 'gta_help'`.
 - Progress uses `exports['esx_progressbar']:Progressbar(...)` when available.
 - If `esx_progressbar` is not installed or fails, it falls back to a simple `Wait()`-based timer.
+- Processing is one leaf per action.
 - Plant rewards and processing output are fully server-side randomized.

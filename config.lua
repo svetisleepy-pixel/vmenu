@@ -30,3 +30,9 @@ Config.PickScenario = 'world_human_gardener_plant'
 Config.ProcessScenario = 'WORLD_HUMAN_CLIPBOARD'
 
 Config.UseProgressFallback = true
+
+Config.InteractionUI = 'textui' -- 'textui' or 'gta_help'
+
+Config.SniffDuration = 4000 -- ms
+Config.SniffAnimDict = 'mp_suicide'
+Config.SniffAnimName = 'pill'
