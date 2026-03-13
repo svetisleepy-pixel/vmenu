@@ -138,14 +138,10 @@ RegisterNetEvent('vmenu_cocaine:server:processLeaves', function()
         return
     end
 
-    xPlayer.removeInventoryItem('coke_leaf', leaves)
+    xPlayer.removeInventoryItem('coke_leaf', 1)
 
-    local totalCoke = 0
-    for _ = 1, leaves do
-        totalCoke = totalCoke + math.random(Config.CokePerLeafMin, Config.CokePerLeafMax)
-    end
-
-    xPlayer.addInventoryItem('coke', totalCoke)
+    local cokeReward = math.random(Config.CokePerLeafMin, Config.CokePerLeafMax)
+    xPlayer.addInventoryItem('coke', cokeReward)
 end)
 
 ESX.RegisterUsableItem('coke', function(source)

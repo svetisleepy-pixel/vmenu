@@ -4,7 +4,7 @@ ESX-compatible cocaine gameplay loop for FiveM:
 
 - Cocaine plants spawn in a configurable field (max 15 by default).
 - Players pick plants with `E`, play a gardener animation, and receive random `coke_leaf`.
-- Players process `coke_leaf` at a configurable location into random `coke`.
+- Players process `coke_leaf` at a configurable location into random `coke` (1 leaf per action).
 - Using `coke` gives armor, speed boost, and a visual effect.
 
 ## Installation
@@ -20,6 +20,7 @@ ESX-compatible cocaine gameplay loop for FiveM:
 
 ## Notes
 
+- Interaction prompt uses native GTA help UI (top-left `Press E`).
 - Progress uses `exports['esx_progressbar']:Progressbar(...)` when available.
 - If `esx_progressbar` is not installed or fails, it falls back to a simple `Wait()`-based timer.
 - Plant rewards and processing output are fully server-side randomized.

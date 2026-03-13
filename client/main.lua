@@ -10,12 +10,23 @@ local function debugPrint(...)
 end
 
 local function showHelpNotification(text)
-    ESX.ShowHelpNotification(text, true)
+    BeginTextCommandDisplayHelp('STRING')
+    AddTextComponentSubstringPlayerName(text)
+    EndTextCommandDisplayHelp(0, false, true, -1)
 end
 
 local function playScenario(scenario)
     local ped = PlayerPedId()
     TaskStartScenarioInPlace(ped, scenario, 0, true)
+end
+
+local function playAnimation(dict, anim, duration)
+    RequestAnimDict(dict)
+    while not HasAnimDictLoaded(dict) do
+        Wait(0)
+    end
+
+    TaskPlayAnim(PlayerPedId(), dict, anim, 8.0, -8.0, duration, 49, 0.0, false, false, false)
 end
 
 local function clearActionState()
@@ -96,6 +107,18 @@ end)
 
 RegisterNetEvent('vmenu_cocaine:client:useCoke', function()
     local ped = PlayerPedId()
+
+    FreezeEntityPosition(ped, true)
+    playAnimation('mp_suicide', 'pill', 3000)
+
+    local finished = runProgressBar('Sniffing cocaine...', 3000)
+    FreezeEntityPosition(ped, false)
+    ClearPedTasks(ped)
+
+    if not finished then
+        return
+    end
+
     SetPedArmour(ped, Config.CokeArmor)
     SetRunSprintMultiplierForPlayer(PlayerId(), Config.CokeSpeedMultiplier)
 
