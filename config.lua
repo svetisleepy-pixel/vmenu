@@ -27,7 +27,8 @@ Config.CokeEffectDuration = 30000 -- ms
 Config.CokeScreenEffect = 'DrugsTrevorClownsFight'
 
 Config.PickScenario = 'world_human_gardener_plant'
-Config.ProcessScenario = 'WORLD_HUMAN_CLIPBOARD'
+Config.ProcessAnimDict = 'mini@repair'
+Config.ProcessAnimName = 'fixing_a_ped'
 
 Config.UseProgressFallback = true
 
@@ -36,3 +37,4 @@ Config.InteractionUI = 'textui' -- 'textui' or 'gta_help'
 Config.SniffDuration = 4000 -- ms
 Config.SniffAnimDict = 'mp_suicide'
 Config.SniffAnimName = 'pill'
+Config.SniffFallbackScenario = 'WORLD_HUMAN_SMOKING_POT'

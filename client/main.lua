@@ -42,12 +42,23 @@ local function playScenario(scenario)
 end
 
 local function playAnimation(dict, anim, duration)
+    if not dict or not anim then
+        return false
+    end
+
     RequestAnimDict(dict)
-    while not HasAnimDictLoaded(dict) do
+
+    local timeout = GetGameTimer() + 4000
+    while not HasAnimDictLoaded(dict) and GetGameTimer() < timeout do
         Wait(0)
     end
 
+    if not HasAnimDictLoaded(dict) then
+        return false
+    end
+
     TaskPlayAnim(PlayerPedId(), dict, anim, 8.0, -8.0, duration, 49, 0.0, false, false, false)
+    return true
 end
 
 local function clearActionState()
@@ -130,7 +141,11 @@ RegisterNetEvent('vmenu_cocaine:client:useCoke', function()
     local ped = PlayerPedId()
 
     FreezeEntityPosition(ped, true)
-    playAnimation(Config.SniffAnimDict, Config.SniffAnimName, Config.SniffDuration)
+
+    local playingAnim = playAnimation(Config.SniffAnimDict, Config.SniffAnimName, Config.SniffDuration)
+    if not playingAnim then
+        TaskStartScenarioInPlace(ped, Config.SniffFallbackScenario, 0, true)
+    end
 
     local finished = runProgressBar('Sniffing cocaine...', Config.SniffDuration)
     FreezeEntityPosition(ped, false)
@@ -208,7 +223,11 @@ CreateThread(function()
 
                         currentAction = true
                         FreezeEntityPosition(ped, true)
-                        playScenario(Config.ProcessScenario)
+
+                        local processAnimPlaying = playAnimation(Config.ProcessAnimDict, Config.ProcessAnimName, Config.ProcessDuration)
+                        if not processAnimPlaying then
+                            playScenario('WORLD_HUMAN_HAMMERING')
+                        end
 
                         local finished = runProgressBar('Processing cocaine leaves...', Config.ProcessDuration)
                         clearActionState()
