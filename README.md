@@ -26,5 +26,5 @@ ESX-compatible cocaine gameplay loop for FiveM:
 - If `esx_progressbar` is not installed or fails, it falls back to a simple `Wait()`-based timer.
 - Processing uses existing GTA scenario `WORLD_HUMAN_HAMMERING`.
 - Sniffing uses existing GTA scenario `WORLD_HUMAN_SMOKING_POT`.
-- Plant entities are now forced to ground placement with collision loading and ground-Z resolution.
+- Plant entities are now forced to ground placement with collision loading and per-plant ground-Z snapping on uneven terrain.
 - Plant rewards and processing output are fully server-side randomized.

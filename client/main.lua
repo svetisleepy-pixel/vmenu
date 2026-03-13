@@ -132,6 +132,23 @@ local function resolvePlantGroundZ(coords)
     return coords.z
 end
 
+
+local function snapPlantEntityToGround(plant)
+    if not plant or not DoesEntityExist(plant.entity) then
+        return
+    end
+
+    local entityCoords = GetEntityCoords(plant.entity)
+    local groundZ = resolvePlantGroundZ(vector3(entityCoords.x, entityCoords.y, entityCoords.z))
+
+    SetEntityCoordsNoOffset(plant.entity, entityCoords.x, entityCoords.y, groundZ, false, false, false)
+    PlaceObjectOnGroundProperly(plant.entity)
+    FreezeEntityPosition(plant.entity, true)
+
+    local finalCoords = GetEntityCoords(plant.entity)
+    plant.coords = vector3(finalCoords.x, finalCoords.y, finalCoords.z)
+end
+
 local function syncPlantEntities(plantData)
     local active = {}
 
@@ -152,6 +169,9 @@ local function syncPlantEntities(plantData)
             PlaceObjectOnGroundProperly(obj)
             FreezeEntityPosition(obj, true)
 
+            local tmpPlant = { entity = obj }
+            snapPlantEntityToGround(tmpPlant)
+
             local objCoords = GetEntityCoords(obj)
             spawnedPlants[plant.id] = {
                 entity = obj,
@@ -160,8 +180,7 @@ local function syncPlantEntities(plantData)
         else
             local ent = spawnedPlants[plant.id].entity
             if DoesEntityExist(ent) then
-                local objCoords = GetEntityCoords(ent)
-                spawnedPlants[plant.id].coords = vector3(objCoords.x, objCoords.y, objCoords.z)
+                snapPlantEntityToGround(spawnedPlants[plant.id])
             end
         end
     end
@@ -291,6 +310,26 @@ CreateThread(function()
     while true do
         Wait(15000)
         TriggerServerEvent('vmenu_cocaine:server:requestPlants')
+    end
+end)
+
+
+
+CreateThread(function()
+    while true do
+        Wait(2000)
+
+        local ped = PlayerPedId()
+        local playerCoords = GetEntityCoords(ped)
+
+        for _, plant in pairs(spawnedPlants) do
+            if DoesEntityExist(plant.entity) then
+                local entityCoords = GetEntityCoords(plant.entity)
+                if #(playerCoords - entityCoords) <= 150.0 then
+                    snapPlantEntityToGround(plant)
+                end
+            end
+        end
     end
 end)
 
