@@ -27,6 +27,6 @@ Config.CokeEffectDuration = 30000 -- ms
 Config.CokeScreenEffect = 'DrugsTrevorClownsFight'
 
 Config.PickScenario = 'world_human_gardener_plant'
-Config.ProcessScenario = 'WORLD_HUMAN_STAND_MOBILE'
+Config.ProcessScenario = 'WORLD_HUMAN_CLIPBOARD'
 
 Config.UseProgressFallback = true

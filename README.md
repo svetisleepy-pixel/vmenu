@@ -20,6 +20,6 @@ ESX-compatible cocaine gameplay loop for FiveM:
 
 ## Notes
 
-- Progress uses `exports['is_ui']:progressBar(...)` when available.
-- If `is_ui` is not installed or fails, it falls back to a simple `Wait()`-based timer.
+- Progress uses `exports['esx_progressbar']:Progressbar(...)` when available.
+- If `esx_progressbar` is not installed or fails, it falls back to a simple `Wait()`-based timer.
 - Plant rewards and processing output are fully server-side randomized.

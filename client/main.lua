@@ -10,9 +10,7 @@ local function debugPrint(...)
 end
 
 local function showHelpNotification(text)
-    BeginTextCommandDisplayHelp('STRING')
-    AddTextComponentSubstringPlayerName(text)
-    EndTextCommandDisplayHelp(0, false, true, -1)
+    ESX.ShowHelpNotification(text, true)
 end
 
 local function playScenario(scenario)
@@ -31,21 +29,7 @@ local function runProgressBar(label, duration)
     local completed = false
 
     local ok, result = pcall(function()
-        if exports['is_ui'] and exports['is_ui'].progressBar then
-            return exports['is_ui']:progressBar({
-                duration = duration,
-                label = label,
-                useWhileDead = false,
-                canCancel = false,
-                disable = {
-                    move = true,
-                    car = true,
-                    combat = true
-                }
-            })
-        end
-
-        return nil
+        return exports['esx_progressbar']:Progressbar(label, duration)
     end)
 
     if ok and result ~= nil then
