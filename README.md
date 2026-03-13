@@ -25,6 +25,6 @@ ESX-compatible cocaine gameplay loop for FiveM:
 - Progress uses `exports['esx_progressbar']:Progressbar(...)` when available.
 - If `esx_progressbar` is not installed or fails, it falls back to a simple `Wait()`-based timer.
 - Processing is one leaf per action.
-- Processing uses animation dict `mini@repair` / `fixing_a_ped` (no clipboard), with fallback scenario.
-- Sniffing uses configurable animation with fallback scenario if the dict cannot load.
+- Processing uses existing GTA scenario `WORLD_HUMAN_HAMMERING`.
+- Sniffing uses existing GTA scenario `WORLD_HUMAN_SMOKING_POT`.
 - Plant rewards and processing output are fully server-side randomized.
