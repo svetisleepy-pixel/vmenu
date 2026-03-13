@@ -3,7 +3,7 @@ Config = {}
 Config.Debug = false
 
 Config.MaxPlants = 15
-Config.PlantModel = `prop_weed_02`
+Config.PlantModel = `prop_skunk_bush_01`
 Config.PlantRespawnTime = 10 -- seconds
 Config.HarvestDuration = 4000 -- ms
 Config.ProcessDuration = 7000 -- ms

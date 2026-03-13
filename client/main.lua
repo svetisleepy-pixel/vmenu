@@ -42,6 +42,16 @@ local function runProgressBar(label, duration)
     return completed
 end
 
+
+local function resolvePlantGroundZ(coords)
+    local ok, groundZ = GetGroundZFor_3dCoord(coords.x, coords.y, coords.z + 200.0, false)
+    if ok then
+        return groundZ
+    end
+
+    return coords.z
+end
+
 local function syncPlantEntities(plantData)
     local active = {}
 
@@ -54,7 +64,9 @@ local function syncPlantEntities(plantData)
                 Wait(0)
             end
 
-            local obj = CreateObject(Config.PlantModel, plant.coords.x, plant.coords.y, plant.coords.z - 1.0, false, false, false)
+            local spawnZ = resolvePlantGroundZ(plant.coords)
+            local obj = CreateObject(Config.PlantModel, plant.coords.x, plant.coords.y, spawnZ, false, false, false)
+            SetEntityAsMissionEntity(obj, true, true)
             PlaceObjectOnGroundProperly(obj)
             FreezeEntityPosition(obj, true)
 
@@ -166,6 +178,14 @@ CreateThread(function()
         end
 
         Wait(waitTime)
+    end
+end)
+
+
+CreateThread(function()
+    while true do
+        Wait(15000)
+        TriggerServerEvent('vmenu_cocaine:server:requestPlants')
     end
 end)
 
