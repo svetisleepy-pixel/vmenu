@@ -282,6 +282,12 @@ end
 
 exports('useDrug', useDrug)
 
+
+RegisterNetEvent('vmenu_drugs:useDrug', function(data, slot)
+    useDrug(data, slot)
+end)
+
+
 AddEventHandler('onResourceStop', function(resource)
     if resource ~= GetCurrentResourceName() then return end
 
