@@ -269,7 +269,7 @@ CreateThread(function()
     end
 end)
 
-exports('useDrug', function(data, slot)
+function useDrug(data, slot)
     if busy then
         return false
     end
@@ -278,7 +278,9 @@ exports('useDrug', function(data, slot)
     applyDrugEffect()
     busy = false
     return true
-end)
+end
+
+exports('useDrug', useDrug)
 
 AddEventHandler('onResourceStop', function(resource)
     if resource ~= GetCurrentResourceName() then return end

@@ -27,7 +27,7 @@ Add these items in your ox_inventory data/items.lua:
     close = true,
     description = 'Ready to use.',
     client = {
-        export = 'vmenu_drugs.useDrug'
+        export = 'vmenu_drugs.useDrug' -- replace vmenu_drugs with your actual resource folder name
     }
 },
 ```
